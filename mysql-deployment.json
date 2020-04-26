@@ -1,0 +1,71 @@
+{
+	"apiVersion": "apps/v1",
+	"kind": "Deployment",
+	"metadata": {
+		"name": "mysql-deployment",
+		"namespace": "elibrary"
+	},
+	"spec": {
+		"replicas": 1,
+		"template": {
+			"metadata": {
+				"namespace": "elibrary",
+				"labels": {
+					"app": "mysql"
+				}
+			},
+			"spec": {
+				"containers": [
+					{
+						"env": [
+							{
+								"name": "MYSQL_DATABASE",
+								"valueFrom": {
+									"secretKeyRef": {
+										"name": "app-secret",
+										"key": "db_name"
+									}
+								}
+							},
+							{
+								"name": "MYSQL_ROOT_PASSWORD",
+								"valueFrom": {
+									"secretKeyRef": {
+										"name": "app-secret",
+										"key": "db_password"
+									}
+								}
+							}
+						],
+						"name": "mysql",
+						"image": "mysql:5.7",
+						"ports": [
+							{
+								"containerPort": 3306
+							}
+						],
+						"volumeMounts": [
+							{
+								"name": "db-pv",
+								"mountPath": "/var/lib/mysql"
+							}
+						]
+					}
+				],
+				"volumes": [
+					{
+						"name": "db-pv",
+						"persistentVolumeClaim": {
+							"claimName": "db-claim"
+						}
+					}
+				]
+			}
+		},
+		"selector": {
+			"matchLabels": {
+				"app": "mysql"
+			}
+		}
+	}
+}
