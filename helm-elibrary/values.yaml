@@ -8,10 +8,16 @@ app:
       allowHost: '"*"'
       dbEngine: '"django.db.backends.mysql"'
       dbUser: root
+    fluentdImage: butter3126/app-fluentd
   svc:
     name: app-service
     port: 8000
     nodePort: 30080
+  conf:
+    logPath: "/var/log/app.log"
+    esHost: http://192.168.99.100:9200
+    esIndexName: elibrary_api
+    esTag: elibrary_api
 db:
   deploy:
     replicas: 1

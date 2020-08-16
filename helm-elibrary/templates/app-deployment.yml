@@ -48,8 +48,24 @@ spec:
           - "-c"
           - " python3 manage.py migrate && gunicorn --timeout=120 --workers=4 --bind
             :8000 eLibrary.wsgi:application"
+        volumeMounts:
+          - name: log-volume
+            mountPath: "/code/log"
         ports:
           - containerPort: {{ .Values.app.deploy.containerPort }}
+      - name: fluentd
+        image: {{ .Values.app.deploy.fluentdImage }}
+        volumeMounts:
+          - name: config-volume
+            mountPath: "/fluentd/etc"
+          - name: log-volume
+            mountPath: "/var/log"
+      volumes:
+        - name: log-volume
+          emptyDir: {}
+        - name: config-volume
+          configMap:
+            name: app-fluentd
   selector:
     matchLabels:
       app: elibrary

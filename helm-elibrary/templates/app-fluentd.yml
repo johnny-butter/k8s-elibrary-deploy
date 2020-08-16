@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-fluentd
+  namespace: {{ .Values.namespace }}
+data:
+  fluent.conf: |-
+    <source>
+      @type tail
+      path {{ .Values.app.conf.logPath }}
+      pos_file {{ .Values.app.conf.logPath }}.pos
+      tag {{ .Values.app.conf.esTag }}.*
+      <parse>
+        @type json
+      </parse>
+    </source>
+
+    <match {{ .Values.app.conf.esTag }}.**>
+      @type elasticsearch
+      hosts {{ .Values.app.conf.esHost }}
+      index_name {{ .Values.app.conf.esIndexName }}
+    </match>
