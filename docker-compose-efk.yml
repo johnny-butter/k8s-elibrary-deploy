@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  elasticsearch:
+    image: elasticsearch:7.3.0
+    environment:
+        - "discovery.type=single-node"
+        - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - 9200:9200
+      - 9300:9300
+    networks:
+      - web_network
+  kibana:
+    image: kibana:7.3.0
+    ports:
+      - 5601:5601
+    depends_on:
+      - elasticsearch
+    networks:
+      - web_network
+
+networks:
+    web_network:
+        driver: bridge
