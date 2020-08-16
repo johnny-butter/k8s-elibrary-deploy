@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-deployment
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.app.deploy.replicas }}
+  template:
+    metadata:
+      namespace: {{ .Values.namespace }}
+      labels:
+        app: elibrary
+    spec:
+      containers:
+      - name: elibrary-app
+        image: {{ .Values.app.deploy.image }}
+        env:
+          - name: ALLOWED_HOSTS
+            value: {{ .Values.app.deploy.env.allowHost }}
+          - name: SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: app-secret
+                key: secret_key
+          - name: DB_ENGINE
+            value: {{ .Values.app.deploy.env.dbEngine }}
+          - name: DB_NAME
+            valueFrom:
+              secretKeyRef:
+                name: app-secret
+                key: db_name
+          - name: DB_USER
+            value: {{ .Values.app.deploy.env.dbUser }}
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: app-secret
+                key: db_password
+          - name: DB_HOST
+            value: {{ .Values.db.svc.name }}
+          - name: DB_PORT
+            valueFrom:
+              secretKeyRef:
+                name: app-secret
+                key: db_port
+        args:
+          - bash
+          - "-c"
+          - " python3 manage.py migrate && gunicorn --timeout=120 --workers=4 --bind
+            :8000 eLibrary.wsgi:application"
+        ports:
+          - containerPort: {{ .Values.app.deploy.containerPort }}
+  selector:
+    matchLabels:
+      app: elibrary

@@ -1,0 +1,23 @@
+namespace: elibrary
+app:
+  deploy:
+    image: butter3126/elibrary
+    replicas: 1
+    containerPort: 8000
+    env:
+      allowHost: '"*"'
+      dbEngine: '"django.db.backends.mysql"'
+      dbUser: root
+  svc:
+    name: app-service
+    port: 8000
+    nodePort: 30080
+db:
+  deploy:
+    replicas: 1
+  svc:
+    name: mysql-service
+    port: 3306
+  pvc:
+    name: db-claim
+    storage: 1Gi
