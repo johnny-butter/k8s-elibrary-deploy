@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.db.svc.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    app: mysql
+  ports:
+  - protocol: TCP
+    port: {{ .Values.db.svc.port }}
+    targetPort: 3306
+  type: NodePort
